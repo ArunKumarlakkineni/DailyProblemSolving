@@ -1,8 +1,15 @@
 class Solution {
-    public int solve(int[] nums,int or,int i,int por){
-        if(i == nums.length)return por == or?1:0;
+    int rr = 0;
+    public void solve(int[] nums,int or,int i,int por){
+        if(i>nums.length) return;
+        if(por==or){
+            rr += (1<<(nums.length-i));
+            return;
+        }
         
-        return solve(nums,or,i+1,por|nums[i])+solve(nums,or,i+1,por);
+        for(int j=i;j<nums.length;j++){
+            solve(nums,or,j+1,por|nums[j]);
+        }
         
     }
     public int countMaxOrSubsets(int[] nums) {
@@ -10,6 +17,7 @@ class Solution {
         for(int i=0;i<nums.length;i++){
             res |= nums[i];
         }
-        return solve(nums,res,0,0);
+        solve(nums,res,0,0);
+        return rr;
     }
 }

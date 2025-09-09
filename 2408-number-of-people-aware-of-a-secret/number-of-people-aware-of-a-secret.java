@@ -1,28 +1,28 @@
 class Solution {
     public int peopleAwareOfSecret(int n, int delay, int forget) {
-        int[] d = new int[n];
-        int MOD = 1000000007;
-        d[0]=1;
-        for(int i=0;i<n;i++){
-            if(d[i]!=0){
-                // System.out.println(i+"___"+d[i]);
-                if(i+delay<n){
-                    int st=i+delay;
-                    int en = i+forget>n?n:i+forget;
-                    for(int j=st;j<en;j++){
-                        d[j]= (d[j]+d[i])%MOD;
-                    }
-                }
+        int MOD = 1_000_000_007;
+
+        long[] dp = new long[n + 1];  
+        dp[0] = 1;
+
+        long shareablePeople = 0; 
+
+        for (int day = 1; day < n; day++) {
+            if (day - delay >= 0) {
+                shareablePeople = (shareablePeople + dp[day - delay]) % MOD;
             }
+            if (day - forget >= 0) {
+                shareablePeople = (shareablePeople - dp[day - forget] + MOD) % MOD;
+            }
+
+            dp[day] = shareablePeople;
         }
-        for(int i=forget-1;i<n-1;i++){
-            
-            d[i-forget+1]=0;
+
+        long total = 0;
+        for (int i = n - forget; i < n; i++) {
+            total = (total + dp[i]) % MOD;
         }
-        int people = 0;
-        for(int i=0;i<n;i++){
-            people=(people+d[i])%MOD;
-        }
-        return people;
+
+        return (int) total;
     }
 }

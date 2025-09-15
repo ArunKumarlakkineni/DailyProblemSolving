@@ -15,24 +15,29 @@ class Solution {
         return balance == 0; // All opened '(' are closed
     }
 
-    public void solve(String s,int i, int n,StringBuilder temp){
-        if(i==n){
-            if(isValidParentheses(temp.toString())){
-                res.add(temp.toString());
-            }
+    private void backtrack(int openN, int closedN, int n, List<String> res, StringBuilder stack) {
+        if (openN == closedN && openN == n) {
+            res.add(stack.toString());
             return;
         }
-        for(int j=0;j<s.length();j++){
-            temp.append(s.charAt(j));
-            solve(s, i+1, n, temp);
-            temp.deleteCharAt(temp.length() - 1);
 
+        if (openN < n) {
+            stack.append('(');
+            backtrack(openN + 1, closedN, n, res, stack);
+            stack.deleteCharAt(stack.length() - 1);
         }
 
+        if (closedN < openN) {
+            stack.append(')');
+            backtrack(openN, closedN + 1, n, res, stack);
+            stack.deleteCharAt(stack.length() - 1);
+        }
     }
     public List<String> generateParenthesis(int n) {
-        String ss = "()";
-        solve(ss,0,n*2,new StringBuilder());
+        List<String> res = new ArrayList<>();
+        StringBuilder stack = new StringBuilder();
+        backtrack(0, 0, n, res, stack);
+
         return res;
     }
 }

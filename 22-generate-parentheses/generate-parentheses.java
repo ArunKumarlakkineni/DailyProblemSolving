@@ -15,23 +15,24 @@ class Solution {
         return balance == 0; // All opened '(' are closed
     }
 
-    public void solve(String s,int i, int n,String temp){
+    public void solve(String s,int i, int n,StringBuilder temp){
         if(i==n){
-            if(isValidParentheses(temp)){
-                res.add(temp);
+            if(isValidParentheses(temp.toString())){
+                res.add(temp.toString());
             }
             return;
         }
         for(int j=0;j<s.length();j++){
-            temp+=s.charAt(j);
-            solve(s,i+1,n,temp);
-            temp=temp.substring(0,temp.length()-1);
+            temp.append(s.charAt(j));
+            solve(s, i+1, n, temp);
+            temp.deleteCharAt(temp.length() - 1);
+
         }
 
     }
     public List<String> generateParenthesis(int n) {
         String ss = "()";
-        solve(ss,0,n*2,"");
+        solve(ss,0,n*2,new StringBuilder());
         return res;
     }
 }

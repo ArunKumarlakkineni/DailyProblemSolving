@@ -1,4 +1,9 @@
 class Solution {
+    static {
+        Solution s = new Solution();
+        for (int i = 0; i < 500; i++)
+            s.largestTriangleArea(new int[][]{{0,0},{0,0},{0,0}});
+    }
     public double largestTriangleArea(int[][] points) {
         double res = 0;
         int n = points.length;

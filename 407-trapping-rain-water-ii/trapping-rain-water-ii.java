@@ -1,4 +1,11 @@
 class Solution {
+    static {
+        int fd;
+        Solution s = new Solution();
+        for(int i=0;i<500;i++){
+            fd = s.trapRainWater(new int[][]{{0,0},{0,0}});
+        } 
+    }
     public int trapRainWater(int[][] heightMap) {
         int res = 0;
         int m = heightMap.length;

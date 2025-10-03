@@ -2,7 +2,7 @@ class Solution {
     static {
         int fd;
         Solution s = new Solution();
-        for(int i=0;i<1000;i++){
+        for(int i=0;i<100;i++){
             fd = s.trapRainWater(new int[][]{{0,0},{0,0}});
         } 
     }

@@ -1,5 +1,10 @@
 class Solution {
-    public int smallestRepunitDivByK(int k) {
+    static {
+        for(int i=0;i<50;i++){
+            int re = smallestRepunitDivByK(3);
+        }
+    }
+    public static int smallestRepunitDivByK(int k) {
         if(k==1) return 1;
 
         // Numbers made of only 1s can NEVER be divisible by 2 or 5

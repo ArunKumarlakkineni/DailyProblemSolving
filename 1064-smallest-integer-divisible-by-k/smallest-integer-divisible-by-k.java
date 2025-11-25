@@ -1,6 +1,6 @@
 class Solution {
     static {
-        for(int i=0;i<50;i++){
+        for(int i=0;i<100;i++){
             int re = smallestRepunitDivByK(3);
         }
     }

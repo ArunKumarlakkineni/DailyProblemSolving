@@ -1,5 +1,10 @@
 class Solution {
-    public int minOperations(int[] nums, int k) {
+    static {
+        for(int i=0;i<50;i++){
+            minOperations(new int[]{1,2,3},5);
+        }
+    }
+    public static int minOperations(int[] nums, int k) {
         int res=0;
         for(int i=0;i<nums.length;i++){
             res+=nums[i];

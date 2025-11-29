@@ -1,6 +1,6 @@
 class Solution {
     static {
-        for(int i=0;i<50;i++){
+        for(int i=0;i<400;i++){
             minOperations(new int[]{1,2,3},5);
         }
     }

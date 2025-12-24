@@ -1,13 +1,10 @@
 class Solution {
     public int minimumBoxes(int[] apple, int[] capacity) {
         int tot = Arrays.stream(apple).sum();
-        capacity = Arrays.stream(capacity)
-                 .boxed()
-                 .sorted(Collections.reverseOrder())
-                 .mapToInt(Integer::intValue)
-                 .toArray();
+        Arrays.sort(capacity);
         int res = 0;
-        for(int i=0;i<capacity.length;i++){
+        int n = capacity.length;
+        for(int i=n-1;i>=0;i--){
             if(tot<=0){
                 break;
             }

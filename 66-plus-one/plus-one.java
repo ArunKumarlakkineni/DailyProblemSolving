@@ -11,7 +11,6 @@ class Solution {
             
             carry = digs/10;
             digits[i] = digs%10;
-            System.out.println(digs);
             if(carry ==0) return digits;
         }
         if(carry!=0){

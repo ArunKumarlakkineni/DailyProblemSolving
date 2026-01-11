@@ -22,17 +22,17 @@ class Solution {
         return root.val;
     }
     public int maxProduct(TreeNode root) {
-        long total = dfs(root);
-        Queue<TreeNode> q = new ArrayDeque<>();
+        long tot = dfs(root);
+        Queue<TreeNode> q = new LinkedList<>();
         q.add(root);
+        long maxi = Integer.MIN_VALUE;
         while(!q.isEmpty()){
-            TreeNode node = q.poll();
-            if(node==null)continue;
-            long cur = (total-node.val)*node.val;
-            ans = Math.max(ans,cur);
-            if(node.left!=null) q.add(node.left);
-            if(node.right!=null) q.add(node.right);
+            TreeNode cur = q.poll();
+            long curP = (tot-cur.val)*cur.val;
+            maxi = Math.max(maxi,curP);
+            if(cur.left!=null) q.add(cur.left);
+            if(cur.right!=null) q.add(cur.right);
         }
-        return (int)(ans%MOD);
+        return (int)(maxi%MOD);
     }
 }

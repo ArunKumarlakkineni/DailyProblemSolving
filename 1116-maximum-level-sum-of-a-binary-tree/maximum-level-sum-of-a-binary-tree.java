@@ -18,7 +18,7 @@ class Solution {
         int res = Integer.MIN_VALUE;
         int level = 0;
         int res1 = 0;
-        if(root.left==null && root.right==null) return 1;
+        if(root.left==null && root.right==null) return root.val;
         Queue<TreeNode> q = new ArrayDeque<>();
         q.add(root);
         while(!q.isEmpty()){

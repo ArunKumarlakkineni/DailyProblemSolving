@@ -1,132 +1,135 @@
-import java.util.*;
-
 class Solution {
-    // Helper class to represent active X-intervals
-    private static class Interval implements Comparable<Interval> {
-        int start, end;
-        
-        Interval(int start, int end) {
-            this.start = start;
-            this.end = end;
-        }
-        
-        // Needed for sort
-        public int compareTo(Interval other) {
-            if (this.start != other.start) return Integer.compare(this.start, other.start);
-            return Integer.compare(this.end, other.end);
-        }
+    static class Event {
+        long y;
+        int x1, x2;
+        int type;
 
-        // Needed for removing specific objects from ArrayList
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Interval interval = (Interval) o;
-            return start == interval.start && end == interval.end;
+        Event(long y, int x1, int x2, int type) {
+            this.y = y;
+            this.x1 = x1;
+            this.x2 = x2;
+            this.type = type;
         }
     }
 
-    // Helper class for Sweep Line events
-    private static class Event implements Comparable<Event> {
-        int y;
-        int type; // 1 for start, -1 for end
-        int xStart, xEnd;
+    static class SegmentTree {
+        int[] cnt;
+        double[] len;
+        double[] xs;
 
-        Event(int y, int type, int xStart, int xEnd) {
-            this.y = y;
-            this.type = type;
-            this.xStart = xStart;
-            this.xEnd = xEnd;
+        SegmentTree(double[] xs) {
+            this.xs = xs;
+            int n = xs.length - 1;
+            cnt = new int[4 * n];
+            len = new double[4 * n];
         }
 
-        public int compareTo(Event other) {
-            return Integer.compare(this.y, other.y);
+        void update(int node, int start, int end, int add_start, int add_end, int val) {
+            if (add_start > end || add_end < start) return;
+
+            if (add_start <= start && end <= add_end) {
+                cnt[node] += val;
+                if (cnt[node] > 0) {
+                    len[node] = xs[end + 1] - xs[start];
+                } else {
+                    len[node] = (start == end) ? 0 : len[node * 2] + len[node * 2 + 1];
+                }
+                return;
+            }
+
+            int mid = (start + end) / 2;
+            update(node * 2, start, mid, add_start, add_end, val);
+            update(node * 2 + 1, mid + 1, end, add_start, add_end, val);
+
+            if (cnt[node] == 0) {
+                len[node] = len[node * 2] + len[node * 2 + 1];
+            }
+        }
+
+        double query() {
+            return len[1];
         }
     }
 
     public double separateSquares(int[][] squares) {
-        List<Event> sweepEvents = new ArrayList<>();
+        Set<Integer> x_set = new TreeSet<>();
+        List<Event> events = new ArrayList<>();
+
         for (int[] sq : squares) {
-            int x = sq[0];
-            int y = sq[1];
-            int l = sq[2];
-            sweepEvents.add(new Event(y, 1, x, x + l));
-            sweepEvents.add(new Event(y + l, -1, x, x + l));
+            int xi = sq[0], yi = sq[1], li = sq[2];
+            int xj = xi + li, yj = yi + li;
+
+            x_set.add(xi);
+            x_set.add(xj);
+            events.add(new Event(yi, xi, xj, 1));
+            events.add(new Event(yj, xi, xj, -1));
         }
 
-        Collections.sort(sweepEvents);
-
-        List<Interval> activeIntervals = new ArrayList<>();
-        // Store strips as: [y_bottom, height, union_width]
-        List<double[]> processedStrips = new ArrayList<>();
-        
-        double totalArea = 0;
-        int prevY = sweepEvents.get(0).y;
-
-        for (Event event : sweepEvents) {
-            // Process the gap (strip) between the previous event and this one
-            if (event.y > prevY) {
-                double unionWidth = getUnionWidth(activeIntervals);
-                double height = (double) event.y - prevY;
-                
-                if (unionWidth > 0) {
-                    processedStrips.add(new double[]{prevY, height, unionWidth});
-                    totalArea += height * unionWidth;
-                }
-            }
-
-            // Update active intervals list
-            Interval currentInterval = new Interval(event.xStart, event.xEnd);
-            if (event.type == 1) {
-                activeIntervals.add(currentInterval);
-            } else {
-                activeIntervals.remove(currentInterval);
-            }
-            
-            prevY = event.y;
+        List<Integer> x_list = new ArrayList<>(x_set);
+        int m = x_list.size();
+        double[] xs = new double[m];
+        for (int i = 0; i < m; i++) {
+            xs[i] = x_list.get(i);
         }
 
-        // Second Pass: Find the split point
-        double targetArea = totalArea / 2.0;
-        double accumulatedArea = 0;
-
-        for (double[] strip : processedStrips) {
-            double bottomY = strip[0];
-            double height = strip[1];
-            double width = strip[2];
-            double stripArea = height * width;
-
-            if (accumulatedArea + stripArea >= targetArea) {
-                double missingArea = targetArea - accumulatedArea;
-                return bottomY + (missingArea / width);
-            }
-            accumulatedArea += stripArea;
+        Map<Integer, Integer> tree_to_list = new HashMap<>();
+        for (int i = 0; i < m; i++) {
+            tree_to_list.put(x_list.get(i), i);
         }
 
-        return 0.0;
-    }
+        events.sort((a, b) -> {
+            if (a.y != b.y) return Long.compare(a.y, b.y);
+            return Integer.compare(b.type, a.type);
+        });
 
-    // Brute force union width calculation: O(K log K) where K is active squares
-    private double getUnionWidth(List<Interval> intervals) {
-        if (intervals.isEmpty()) return 0;
+        double total_area = 0;
+        double prev_y = events.get(0).y;
+        SegmentTree seg1 = new SegmentTree(xs);
 
-        // Create a copy to sort, so we don't mess up the main list order unnecessarily
-        List<Interval> sorted = new ArrayList<>(intervals);
-        Collections.sort(sorted);
+        for (Event e : events) {
+            double y = e.y;
+            double height = y - prev_y;
+            double width = seg1.query();
+            total_area += width * height;
 
-        double unionLength = 0;
-        double currentEnd = -1e18; // Negative infinity
+            int start_idx = tree_to_list.get(e.x1);
+            int end_idx = tree_to_list.get(e.x2);
+            seg1.update(1, 0, m - 2, start_idx, end_idx - 1, e.type);
 
-        for (Interval iv : sorted) {
-            if (iv.start >= currentEnd) {
-                // Disjoint interval
-                unionLength += (iv.end - iv.start);
-                currentEnd = iv.end;
-            } else if (iv.end > currentEnd) {
-                // Overlapping interval
-                unionLength += (iv.end - currentEnd);
-                currentEnd = iv.end;
-            }
+            prev_y = y;
         }
-        return unionLength;
+
+        double target = total_area / 2.0;
+
+        prev_y = events.get(0).y;
+        double accumulated = 0;
+        SegmentTree seg2 = new SegmentTree(xs);
+
+        Event firstEvent = events.get(0);
+        seg2.update(1, 0, m - 2,
+                   tree_to_list.get(firstEvent.x1),
+                   tree_to_list.get(firstEvent.x2) - 1,
+                   firstEvent.type);
+
+        for (int i = 1; i < events.size(); i++) {
+            Event e = events.get(i);
+            double y = e.y;
+            double height = y - prev_y;
+            double width = seg2.query();
+
+            if (accumulated + width * height >= target) {
+                double need = target - accumulated;
+                return prev_y + need / width;
+            }
+
+            accumulated += width * height;
+            prev_y = y;
+
+            int start_idx = tree_to_list.get(e.x1);
+            int end_idx = tree_to_list.get(e.x2);
+            seg2.update(1, 0, m - 2, start_idx, end_idx - 1, e.type);
+        }
+
+        return prev_y;
     }
 }

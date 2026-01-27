@@ -1,29 +1,27 @@
 class Solution {
-    int[][] dp;
-    int m, n;
-
-    public int dfs(int[][] grid, int i, int j) {
-       if (i >= m || j >= n) return Integer.MAX_VALUE;
-
-        // Destination cell
-        if (i == m - 1 && j == n - 1) return grid[i][j];
-
-        // Memoization
-        if (dp[i][j] != -1) return dp[i][j];
-
-        int down = dfs(grid, i + 1, j);
-        int right = dfs(grid, i, j + 1);
-
-        return dp[i][j] = grid[i][j] + Math.min(down, right);
-    }
+    
     public int minPathSum(int[][] grid) {
-        m = grid.length;
-        n = grid[0].length;
+        int m = grid.length, n = grid[0].length;
+        int[] dp = new int[n];
 
-        dp = new int[m][n];
-        for (int i = 0; i < m; i++) {
-            Arrays.fill(dp[i], -1);
+        // initialize first cell
+        dp[0] = grid[0][0];
+
+        // first row
+        for (int j = 1; j < n; j++) {
+            dp[j] = dp[j - 1] + grid[0][j];
         }
-        return dfs(grid,0,0);
+
+        // remaining rows
+        for (int i = 1; i < m; i++) {
+            // first column (can only come from top)
+            dp[0] = dp[0] + grid[i][0];
+
+            for (int j = 1; j < n; j++) {
+                dp[j] = grid[i][j] + Math.min(dp[j], dp[j - 1]);
+            }
+        }
+
+        return dp[n - 1];
     }
 }

@@ -17,6 +17,7 @@ class Solution {
             int[] cur = pq.poll();
             int u = cur[0];
             int weight = cur[1];
+            if(u==n-1) return weight;
             for(int[] neigh:adj.get(u)){
                 int v = neigh[0];
                 int newWeight = weight+neigh[1];
@@ -26,6 +27,6 @@ class Solution {
                 }
             }
         }
-        return dist[n-1]==Integer.MAX_VALUE?-1:dist[n-1];
+        return -1;
     }
 }

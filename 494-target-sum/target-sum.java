@@ -1,14 +1,31 @@
 class Solution {
-    public int solve(int[] nums,int ts,int i,int sum){
-        if(ts==sum && i==nums.length) return 1;
-        if(i>=nums.length) return 0;
-        int pos = solve(nums,ts,i+1,sum+nums[i]);
-        int neg = solve(nums,ts,i+1,sum-nums[i]);
-        return pos+neg;
+    int[][] dp;
+    int offset;
+
+    public int solve(int[] nums, int i, int sum, int target) {
+        if (i == nums.length) {
+            return sum == target ? 1 : 0;
+        }
+
+        if (dp[i][sum + offset] != -1) {
+            return dp[i][sum + offset];
+        }
+
+        int add = solve(nums, i + 1, sum + nums[i], target);
+        int sub = solve(nums, i + 1, sum - nums[i], target);
+
+        return dp[i][sum + offset] = add + sub;
     }
+
     public int findTargetSumWays(int[] nums, int target) {
-        int tot = Arrays.stream(nums).sum();
-        int ts = tot-target;
-        return solve(nums,target,0,0);
+        int total = 0;
+        for (int n : nums) total += Math.abs(n);
+
+        offset = total;
+        dp = new int[nums.length][2 * total + 1];
+
+        for (int[] row : dp) Arrays.fill(row, -1);
+
+        return solve(nums, 0, 0, target);
     }
 }

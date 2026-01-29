@@ -1,22 +1,14 @@
 class Solution {
-    Map<String, Integer> memo = new HashMap<>();
-    public int solve(int[] nums,int in,int target,int cursum){
-        if(in<0 && target == cursum){
-            return 1;
-        }
-        if(in<0){
-            return 0;
-        }
-        String key = in + "," + cursum;
-        if (memo.containsKey(key)) {
-            return memo.get(key);
-        }
-        int pos = solve(nums,in-1,target,cursum+nums[in]);
-        int neg = solve(nums,in-1,target,cursum-nums[in]);
-        memo.put(key, pos + neg);
-        return memo.get(key);
+    public int solve(int[] nums,int ts,int i,int sum){
+        if(ts==sum && i==nums.length) return 1;
+        if(i>=nums.length) return 0;
+        int pos = solve(nums,ts,i+1,sum+nums[i]);
+        int neg = solve(nums,ts,i+1,sum-nums[i]);
+        return pos+neg;
     }
     public int findTargetSumWays(int[] nums, int target) {
-        return solve(nums,nums.length-1,target,0);
+        int tot = Arrays.stream(nums).sum();
+        int ts = tot-target;
+        return solve(nums,target,0,0);
     }
 }

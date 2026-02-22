@@ -1,7 +1,7 @@
 class Solution {
     public int binaryGap(int n) {
         int res = 0;
-        int fir = -1,sec = -1;
+        int fir = -1;
         int in = 0;
         while(n!=0){
             if((n&1)==1){

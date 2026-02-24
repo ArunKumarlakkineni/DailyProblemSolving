@@ -14,27 +14,19 @@
  * }
  */
 class Solution {
-    public void solve(TreeNode root, List<String> nums, String temp) {
-        if (root == null) return;
+    public int solve(TreeNode root, int current) {
+        if (root == null) return 0;
 
-        temp += root.val;
+        current = (current << 1) | root.val;
 
-        // Add only when it's a leaf
-        if (root.left == null && root.right == null) {
-            nums.add(temp);
-            return;
-        }
+        if (root.left == null && root.right == null)
+            return current;
 
-        solve(root.left, nums, temp);
-        solve(root.right, nums, temp);
+        return solve(root.left, current) + 
+               solve(root.right, current);
     }
 
     public int sumRootToLeaf(TreeNode root) {
-        List<String> nums = new ArrayList<>();
-        solve(root, nums, "");
-
-        return nums.stream()
-                .mapToInt(s -> Integer.parseInt(s, 2))
-                .sum();
+        return solve(root, 0);
     }
 }

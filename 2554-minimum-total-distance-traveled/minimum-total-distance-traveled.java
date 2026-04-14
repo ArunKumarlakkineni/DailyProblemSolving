@@ -26,7 +26,6 @@ class Solution {
                 slots.add(f[0]);
             }
         }
-
         dp = new long[robot.size()][slots.size()];
         for (long[] row : dp) Arrays.fill(row, -1);
 

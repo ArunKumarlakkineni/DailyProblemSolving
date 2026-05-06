@@ -1,0 +1,25 @@
+class Solution {
+    public char[][] rotateTheBox(char[][] boxGrid) {
+        int rows = boxGrid.length;
+        int cols = boxGrid[0].length;
+        for (int r = 0; r < rows; r++) {
+            int p = 0;
+            for (int c = 0; c < cols; c++) {
+                if (boxGrid[r][c] == '.') {
+                    char temp = boxGrid[r][c];
+                    boxGrid[r][c] = boxGrid[r][p];
+                    boxGrid[r][p] = temp;
+                    p++;
+                } else if (boxGrid[r][c] == '*')
+                    p = c + 1;
+            }
+        }
+        
+        char[][] res = new char[cols][rows];
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
+                res[c][rows - 1 - r] = boxGrid[r][c];
+                
+        return res;
+    }
+}
